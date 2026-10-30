@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fawodie | Premium Experience</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #ffffff; --card: #ffffff; --primary: #c96b2c; --secondary: #1a1a1a;
+      --text: #333; --muted: #777; --border: #eeeeee; --radius: 20px; --shadow: 0 15px 35px rgba(0,0,0,0.05);
+    }
+
+    body.dark-theme {
+      --bg: #121212; --card: #1e1e1e; --text: #f5f5f5; --muted: #aaa; --border: #333; --shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); transition: 0.3s; }
+    .container { max-width: 500px; margin: auto; padding: 20px 20px 80px; }
+
+    /* HEADER */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .brand-logo {
+      max-width: 120px;
+      transition: filter 0.3s ease;
+    }
+
+    /* LOGO COLOR CHANGE IN DARK MODE */
+    body.dark-theme .brand-logo {
+      filter: invert(1) brightness(1.15);
+    }
+    .top-controls { display: flex; gap: 10px; align-items: center; }
+    .theme-toggle { background: var(--border); border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; color: var(--text); font-weight: 600; }
+
+/* ===== NEW ADDITION: PREMIUM WELCOME SCREEN STYLES ===== */
+    #welcome {
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #052e16, #14532d, #0b2e13);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      opacity: 1;
+      transition: opacity 1s ease;
+      z-index: 999;
+    }
+
+    #welcome.fade-out {
+      opacity: 0;
+    }
+
+    .welcome-logo {
+      width: 140px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .welcome-text {
+      margin-top: 15px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards;
+      animation-delay: 0.5s;
+    }
+
+    .welcome-spinner {
+      margin-top: 25px;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      opacity: 0;
+      animation-delay: 1s;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* SLIDER */
+    .slider-container { width: 100%; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; gap: 15px; margin-bottom: 25px; scrollbar-width: none; }
+    .slider-container::-webkit-scrollbar { display: none; }
+    .slide { flex: 0 0 85%; scroll-snap-align: center; }
+    .slide img { width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); box-shadow: var(--shadow); }
+
+    /* DASHBOARD */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0; }
+    .info-card { background: var(--card); border-radius: var(--radius); padding: 15px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;}
+    
+    .servings-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px; }
+    .serv-btn { background: var(--primary); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+    
+    .calc-box { grid-column: span 2; background: var(--primary); color: white; padding: 15px; border-radius: var(--radius); text-align: center; font-weight: 600; font-size: 0.9rem; }
+
+    /* TIMER BUTTONS */
+    .timer-controls { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+    .t-btn { font-size: 0.6rem; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; background: var(--card); color: var(--text); font-weight: 600; text-transform: uppercase; }
+    .t-btn.primary-t { background: var(--primary); color: white; border: none; }
+    .hidden { display: none; }
+
+    /* CONTENT */
+    .section-card { background: var(--card); border-radius: var(--radius); padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+    h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; text-align: center; margin-bottom: 10px; }
+    h2 { font-family: 'Playfair Display', serif; margin-bottom: 15px; font-size: 1.3rem; }
+    
+    .tab-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; margin-right: 5px; font-size: 0.75rem; font-weight: 600; transition: 0.2s; }
+    .tab-btn.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+    .tab-content { display: none; margin-top: 15px; font-size: 0.9rem; line-height: 1.6; animation: fadeIn 0.4s; }
+    .tab-content.active { display: block; }
+
+    /* GALLERY */
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+    .gallery-item { width: 100%; height: 100px; object-fit: cover; border-radius: 10px; background: #eee; }
+
+    /* CONTACT SECTION */
+    .contact-section { background: var(--card); border-radius: var(--radius); padding: 25px; border: 1px solid var(--border); text-align: center; margin-top: 20px; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+    .contact-item { font-size: 0.8rem; color: var(--muted); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .contact-item strong { color: var(--text); }
+
+    .support { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media print { .theme-toggle, .serv-btn, .timer-controls, #langSelect, .t-btn { display: none; } }
+  
+    /* ===== NEW ADDITION: ENGINEER VIEW SWITCHER ===== */
+  body.force-mobile .container {
+    max-width: 400px !important;
+  }
+
+  body.force-tablet .container {
+    max-width: 700px !important;
+  }
+
+  body.force-laptop .container {
+    max-width: 1000px !important;
+  }
+
+  #devToggle {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: black;
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    z-index: 9999;
+    display: none;
+    gap: 5px;
+  }
+
+  #devToggle button {
+    font-size: 10px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  body.dev-mode #devToggle {
+    display: flex;
+  }
+
+  </style>
+</head>
+<body id="body">
+
+<!-- ===== NEW ADDITION: PREMIUM WELCOME SCREEN ===== -->
+<div id="welcome">
+  <img src="FAWODIE LOGO 2.png" alt="Fawodie" class="welcome-logo">
+  <div class="welcome-text">Premium Attiéké Experience</div>
+  <div class="welcome-spinner"></div>
+</div>
+<!-- ===== END NEW ADDITION ===== -->
+
+<!-- ===== NEW ADDITION: MAIN CONTENT WRAPPER ===== -->
+<div id="main" style="display:none;">
+<!-- ===== END NEW ADDITION ===== -->
+
+<div class="container">
+  <div class="header">
+    <img src="FAWODIE LOGO 2.png" alt="Fawodie" class="brand-logo">
+    <div class="top-controls">
+      <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+      <select id="langSelect" style="padding: 5px; border-radius: 10px;">
+  <option value="en">🇬🇧 English</option>
+  <option value="fr">🇫🇷 Français</option>
+  <option value="it">🇮🇹 Italiano</option>
+  <option value="es">🇪🇸 Español</option>
+  <option value="de">🇩🇪 Deutsch</option>
+</select>
+    </div>
+  </div>
+
+  <div class="slider-container">
+    <div class="slide"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600" alt="Plating 1"></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600" alt="Plating 2"></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=600" alt="Plating 3"></div>
+  </div>
+
+  <h1 id="mainTitle">Attieke Cooking Instructions</h1>
+
+  <div class="dashboard-grid">
+    <div class="info-card">
+      <div id="timerDisplay" style="font-family:monospace; font-size:1.6rem; font-weight:700; color:var(--primary);">10:00</div>
+      <div class="timer-controls">
+        <button id="startBtn" class="t-btn primary-t" onclick="startTimer()">Start</button>
+        <button id="pauseBtn" class="t-btn hidden" onclick="pauseTimer()">Pause</button>
+        <button id="resumeBtn" class="t-btn hidden primary-t" onclick="startTimer()">Resume</button>
+        <button id="resetBtn" class="t-btn hidden" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <span id="labelServings" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing: 1px;">Servings</span>
+      <div class="servings-control">
+        <button class="serv-btn" onclick="updateServings(-1)">-</button>
+        <span id="servCount" style="font-weight:700; font-size:1.3rem;">2</span>
+        <button class="serv-btn" onclick="updateServings(1)">+</button>
+      </div>
+    </div>
+
+    <div class="calc-box" id="calcOutput">
+      Use approx. 250g of Attiéké
+    </div>
+  </div>
+
+  <section class="section-card">
+    <h2 id="prepTitle">1. Preparation</h2>
+    <ol id="prepSteps" style="padding-left:18px;"></ol>
+  </section>
+
+  <section class="section-card">
+    <h2 id="heatTitle">2. Heating Method</h2>
+    <div id="tabsHeader"></div>
+    <div id="tabContentBox"></div>
+  </section>
+
+  <div class="section-card" style="text-align:center;">
+    <h2 id="galleryTitle">Community Creations</h2>
+    <p style="font-size:0.8rem; color:var(--muted); margin-bottom: 10px;">Tag #FawodieAttieke</p>
+    <div class="gallery-grid">
+      <img class="gallery-item" src="https://images.unsplash.com/photo-1567620817606-671e9948e48b?w=200" alt="Creation 1">
+      <img class="gallery-item" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200" alt="Creation 2">
+      <img class="gallery-item" src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=200" alt="Creation 3">
+    </div>
+  </div>
+
+  <section class="contact-section">
+    <h2 style="font-size:1.1rem;">Contact Us</h2>
+    <div class="contact-grid">
+      <a href="https://wa.me/YOUR_NUMBER" class="contact-item">
+        <strong>WhatsApp</strong>
+        <span>+233 00 000 0000</span>
+      </a>
+      <a href="mailto:info@fawodie.com" class="contact-item">
+        <strong>Email</strong>
+        <span>info@fawodie.com</span>
+      </a>
+      <div class="contact-item">
+        <strong>Website</strong>
+        <span>www.fawodie.com</span>
+      </div>
+      <div class="contact-item">
+        <strong>Location</strong>
+        <span>Accra, Ghana</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="support">
+    <button onclick="window.print()" style="background:none; border:none; color:var(--muted); font-size:0.7rem; text-decoration:underline; cursor:pointer;">Print Recipe</button>
+  </div>
+  
+  <!-- ===== NEW ADDITION: ENGINEER VIEW SWITCH PANEL ===== -->
+<div id="devToggle">
+  <button onclick="setView('mobile')">📱</button>
+  <button onclick="setView('tablet')">📲</button>
+  <button onclick="setView('laptop')">💻</button>
+  <button onclick="setView('auto')">♻️</button>
+</div>
+<!-- ===== END NEW ADDITION ===== -->
+  
+  <!-- ===== NEW ADDITION: CLOSE MAIN CONTENT WRAPPER ===== -->
+</div>
+</div>
+
+<script>
+ const welcome = document.getElementById("welcome");
+  const main = document.getElementById("main");
+
+  setTimeout(() => {
+    welcome.classList.add("fade-out");
+
+    setTimeout(() => {
+      welcome.style.display = "none";
+      main.style.display = "block";
+    }, 1000);
+
+  }, 3000);
+
+let servings = 2;
+let initialTime = 600;
+let timeLeft = initialTime;
+let timerId = null;
+
+const translations = {
+  en: {
+    mainTitle: "Attieke Cooking Instructions", prepTitle: "1. Preparation", heatTitle: "2. Heating Method", galleryTitle: "Community Creations", labelServings: "Servings",
+    prep: ["Pour bag into deep bowl.", "Add water until submerged.", "Drain water immediately.", "Choose a method below:"],
+    heat: { steamer: ["Steamer", "5-10 mins. Stir regularly until grains are soft."], microwave: ["Microwave", "3-5 mins. Sprinkle water first."], saucepan: ["Saucepan", "5-10 mins. Add oil/butter."] },
+    calc: (n) => `Use approx. ${n * 125}g of Attiéké (~${(n * 0.8).toFixed(1)} cups)`
+  },
+  fr: {
+    mainTitle: "Instructions de Cuisson Attieke", prepTitle: "1. Préparation", heatTitle: "2. Méthode de Chauffage", galleryTitle: "Créations de la Communauté", labelServings: "Portions",
+    prep: ["Verser dans un bol profond.", "Ajouter l'eau jusqu'à submersion.", "Égoutter immédiatement.", "Choisir une méthode :"],
+    heat: { steamer: ["Vapeur", "5-10 min. Remuer jusqu'à tendreté."], microwave: ["Micro-ondes", "3-5 min. Saupoudrer d'eau."], saucepan: ["Casserole", "5-10 min. Ajouter huile/beurre."] },
+    calc: (n) => `Utilisez env. ${n * 125}g d'Attiéké (~${(n * 0.8).toFixed(1)} tasses)`
+  },
+  it: {
+    mainTitle: "Attieke Istruzioni di Cottura", prepTitle: "1. Preparazione", heatTitle: "2. Metodo di Riscaldamento", galleryTitle: "Creazioni Community", labelServings: "Porzioni",
+    prep: ["Versare in una ciotola.", "Coprire con acqua.", "Scolare immediatamente.", "Scegli un metodo:"],
+    heat: { steamer: ["Vapore", "5-10 min. Mescolare fino a morbidezza."], microwave: ["Microonde", "3-5 min. Spruzzare acqua prima."], saucepan: ["Padella", "5-10 min. Aggiungere olio/burro."] },
+    calc: (n) => `Usa circa ${n * 125}g di Attiéké (~${(n * 0.8).toFixed(1)} tazze)`
+  },
+  es: {
+    mainTitle: "Attieke Instrucciones", prepTitle: "1. Preparación", heatTitle: "2. Método de Calor", galleryTitle: "Creaciones Community", labelServings: "Porciones",
+    prep: ["Vierta en un bol.", "Sumerja en agua.", "Escurra inmediatamente.", "Elija un método:"],
+    heat: { steamer: ["Vapor", "5-10 min. Remueva hasta que esté tierno."], microwave: ["Microondas", "3-5 min. Rocíe agua primero."], saucepan: ["Sartén", "5-10 min. Añada aceite/mantequilla."] },
+    calc: (n) => `Use aprox. ${n * 125}g de Attiéké (~${(n * 0.8).toFixed(1)} tazas)`
+  },
+  de: {
+    mainTitle: "Attieke Kochanleitung", prepTitle: "1. Vorbereitung", heatTitle: "2. Erhitzungsmethode", galleryTitle: "Community-Galerie", labelServings: "Portionen",
+    prep: ["In Schüssel geben.", "Mit Wasser bedecken.", "Sofort abgießen.", "Methode wählen:"],
+    heat: { steamer: ["Dampfer", "5-10 Min. Rühren bis es weich ist."], microwave: ["Mikrowelle", "3-5 Min. Zuerst mit Wasser bespritzen."], saucepan: ["Pfanne", "5-10 Min. Öl/Butter hinzufügen."] },
+    calc: (n) => `Ca. ${n * 125}g Attiéké verwenden (~${(n * 0.8).toFixed(1)} Tassen)`
+  }
+};
+
+function toggleTheme() { document.body.classList.toggle('dark-theme'); }
+
+function updateServings(val) {
+  servings = Math.max(1, Math.min(10, servings + val));
+  document.getElementById('servCount').textContent = servings;
+  updateUI(document.getElementById('langSelect').value);
+}
+
+function startTimer() {
+  if (timerId) return;
+  timerId = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+    } else {
+      pauseTimer();
+      alert("Attiéké is ready!");
+    }
+  }, 1000);
+  updateControls('running');
+}
+
+function pauseTimer() {
+  clearInterval(timerId);
+  timerId = null;
+  updateControls('paused');
+}
+
+function resetTimer() {
+  pauseTimer();
+  timeLeft = initialTime;
+  updateTimerDisplay();
+  updateControls('reset');
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  document.getElementById('timerDisplay').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function updateControls(state) {
+  const btns = {
+    start: document.getElementById('startBtn'),
+    pause: document.getElementById('pauseBtn'),
+    resume: document.getElementById('resumeBtn'),
+    reset: document.getElementById('resetBtn')
+  };
+  Object.values(btns).forEach(b => b.classList.add('hidden'));
+  if (state === 'running') {
+    btns.pause.classList.remove('hidden');
+    btns.reset.classList.remove('hidden');
+  } else if (state === 'paused') {
+    btns.resume.classList.remove('hidden');
+    btns.reset.classList.remove('hidden');
+  } else {
+    btns.start.classList.remove('hidden');
+  }
+}
+
+function updateUI(lang) {
+  const d = translations[lang] || translations.en;
+  document.getElementById('mainTitle').textContent = d.mainTitle;
+  document.getElementById('prepTitle').textContent = d.prepTitle;
+  document.getElementById('heatTitle').textContent = d.heatTitle;
+  document.getElementById('galleryTitle').textContent = d.galleryTitle;
+  document.getElementById('labelServings').textContent = d.labelServings;
+  document.getElementById('prepSteps').innerHTML = d.prep.map(s => `<li>${s}</li>`).join("");
+  document.getElementById('calcOutput').textContent = d.calc(servings);
+  
+  let h = ""; let c = "";
+  Object.keys(d.heat).forEach((k, i) => {
+    h += `<button class="tab-btn ${i===0?'active':''}" onclick="openTab(event,'${k}')">${d.heat[k][0]}</button>`;
+    c += `<div id="${k}" class="tab-content ${i===0?'active':''}"><strong>${d.heat[k][0]}:</strong> ${d.heat[k][1]}</div>`;
+  });
+  document.getElementById('tabsHeader').innerHTML = h;
+  document.getElementById('tabContentBox').innerHTML = c;
+}
+
+function openTab(e, id) {
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  e.currentTarget.classList.add('active');
+}
+
+document.getElementById('langSelect').onchange = (e) => updateUI(e.target.value);
+updateUI('en');
+</script>
+
+<!-- ===== NEW ADDITION: ENGINEER VIEW CONTROL ===== -->
+<script>
+  function setView(view) {
+    document.body.classList.remove('force-mobile', 'force-tablet', 'force-laptop');
+
+    if (view === 'mobile') document.body.classList.add('force-mobile');
+    if (view === 'tablet') document.body.classList.add('force-tablet');
+    if (view === 'laptop') document.body.classList.add('force-laptop');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'd') {
+      document.body.classList.toggle('dev-mode');
+    }
+  });
+</script>
+<!-- ===== END NEW ADDITION ===== -->
+</body>
+</html>
